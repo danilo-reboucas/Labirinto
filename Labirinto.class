@@ -1,0 +1,136 @@
+public class Labirinto {
+	
+	static int LARGURA = 16;
+	static int ALTURA = 8;
+	static double PROBABILIDADE = 0.7;
+
+	static char PAREDE_VERTICAL = '|';
+	static char PAREDE_HORIZONTAL = '=';
+	static char PAREDE_CANTO = 'Ⴕ';
+	static char PAREDE = 'Ш';
+	static char VAZIO = ' ';
+	static char INICIO = '҂';
+	static char FIM = '҉';
+	static char FLAG = 'F';
+
+	static char tabuleiro[][] = new char[LARGURA][ALTURA];
+
+	static void inicializar_matriz() {
+		// cantos
+		tabuleiro[0][0] = PAREDE_CANTO;
+		tabuleiro[0][ALTURA - 1] = PAREDE_CANTO;
+		tabuleiro[LARGURA - 1][0] = PAREDE_CANTO;
+		tabuleiro[LARGURA - 1][ALTURA - 1] = PAREDE_CANTO;
+		
+		// paredes horizontais
+		for (int i = 1; i < LARGURA - 1; i ++) {
+			tabuleiro[i][0] = PAREDE_HORIZONTAL;
+			tabuleiro[i][ALTURA - 1] = PAREDE_HORIZONTAL;
+		}
+
+		// paredes verticais
+		for (int i = 1; i < ALTURA - 1; i++) {
+			tabuleiro[0][i] = PAREDE_VERTICAL;
+			tabuleiro[LARGURA - 1][i] = PAREDE_VERTICAL;
+		}
+
+		// centro
+		for (int j = 1; j < ALTURA - 1; j++) {
+			for (int i = 1; i < LARGURA - 1; i++) {
+				if (Math.random() > PROBABILIDADE) {
+					tabuleiro[i][j] = PAREDE;
+				}else {
+					tabuleiro[i][j] = VAZIO;
+				}
+			}
+		}
+	}
+
+	static int random_integer(int min, int max) {
+	    return (int) ((Math.random() * (max - min)) + min);
+	}
+
+	static void mostrar_tabuleiro() {
+		for (int j = 0; j < ALTURA; j++) {
+			for (int i = 0; i < LARGURA; i ++) {
+				System.out.print(tabuleiro[i][j]);
+			}
+			System.out.println();
+		}
+	}
+
+	static void gerar_inicio() {
+		// primeiro quadrante
+		int i = random_integer(1, Math.floorDiv(LARGURA, 2));
+		int j = random_integer(1, Math.floorDiv(ALTURA, 2));
+		tabuleiro[i][j] = INICIO;
+	}
+
+	static void gerar_fim() {
+		// quarto quadrante
+		int i = random_integer(Math.floorDiv(LARGURA, 2) + 1, LARGURA - 1);
+		int j = random_integer(Math.floorDiv(ALTURA, 2) + 1, ALTURA - 1);
+		tabuleiro[i][j] = FIM;
+	}
+
+	static boolean procurar_caminho() {
+		for (int j = 1; j < ALTURA; j++) {
+			for (int i = 1; i < LARGURA; i ++) {
+				if (tabuleiro[i][j] == '҂') {
+					// procurando espaço
+					// cima
+					if (tabuleiro[i][j - 1] == VAZIO) {
+						tabuleiro[i][j - 1] = FLAG;
+					}if (tabuleiro[i][j - 1] == FIM) {
+						System.out.println("Caminho ncontrado");
+						return false;
+					} // direita
+					if (tabuleiro[i + 1][j] == VAZIO) {
+						tabuleiro[i + 1][j] = FLAG;
+					}if (tabuleiro[i + 1][j] == FIM) {
+						System.out.println("Caminho encontrado");
+						return false;
+					}// baixo
+					if (tabuleiro[i][j + 1] == VAZIO) {
+						tabuleiro[i][j + 1] = FLAG;
+					}if (tabuleiro[i][j + 1] == FIM) {
+						System.out.println("Caminho encontrado");
+						return false;
+					}// esquerda
+					if (tabuleiro[i - 1][j] == VAZIO) {
+						tabuleiro[i - 1][j] = FLAG;
+					}if (tabuleiro[i - 1][j] == FIM) {
+						System.out.println("Caminho encontrado");
+						return false;
+					}
+				}
+			}
+			
+		}
+		boolean continuar = false;
+		for (int j = 1; j < ALTURA; j++) {
+			for (int i = 1; i < LARGURA; i ++) {
+				if (tabuleiro[i][j] == FLAG) {
+					tabuleiro[i][j] = INICIO;
+					continuar = true;
+				}
+			}
+		}
+		if (continuar == false) {
+			System.out.println("Caminho não encontrado");
+		}
+		return continuar;
+	}
+	
+	
+
+	public static void main(String[] args) {
+		inicializar_matriz();
+		gerar_inicio();
+		gerar_fim();
+		mostrar_tabuleiro();
+		while (procurar_caminho()) {
+			mostrar_tabuleiro();
+		};
+	}
+}
